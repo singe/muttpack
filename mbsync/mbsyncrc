@@ -1,1 +1,7 @@
 # Put your mbsync config here
+Host davmail
+Port 1143
+SSLType None
+AuthMechs LOGIN
+User user@domain.com
+Pass Password # You can use any password for davmail

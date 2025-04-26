@@ -10,8 +10,6 @@ services:
     networks:
       - default # Internet
       - mail_network # Private mail network
-    ports:
-      - "127.0.0.1:1389:1389"  # LDAP port accessible only to the host
     expose:
       - "1143"  # IMAP port over private network
       - "1025"  # SMTP port over private network
