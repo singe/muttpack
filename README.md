@@ -25,25 +25,25 @@ flowchart TD
       HostDownloads["~/Downloads"]
     end
 
-    subgraph "Private mail network<br>."
+    subgraph "Private mail network"
       Davmail((davmail))
       Mbsync((mbsync))
       Msmtp((msmtp))
     end
 
-    subgraph "No Network Access<br>."
+    subgraph "No Network Access"
       Mutt((Mutt))
     end
 
     O365 <---> Davmail
-    Davmail -->|Exposes IMAP on port 1143<br>.| Mbsync
-    Davmail -->|Exposes SMTP on port 1025<br>.| Msmtp
-    Mbsync -->|Fetches mail via IMAP<br>.| Davmail
+    Davmail -->|Exposes IMAP on port 1143| Mbsync
+    Davmail -->|Exposes SMTP on port 1025| Msmtp
+    Mbsync -->|Fetches mail via IMAP| Davmail
     Msmtp -->|Sends mail via SMTP| Davmail
 
     Mbsync -->|Writes mail to Maildir| HostMailDir
-    Msmtp -->|Reads mail from SMTP Queue<br>.| HostMsmtpQueue
-    Mutt -->|Reads mail from Maildir<br>.| HostMailDir
+    Msmtp -->|Reads mail from SMTP Queue| HostMsmtpQueue
+    Mutt -->|Reads mail from Maildir| HostMailDir
     Mutt -->|Writes mail to SMTP Queue| HostMsmtpQueue
     Mutt -->|Shares files with Host| HostDownloads
 ```
