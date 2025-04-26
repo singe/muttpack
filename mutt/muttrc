@@ -1,0 +1,3 @@
+#These are only settings relevant to the container locations, import your preferred mutt settings
+set folder=$HOME/.mail/
+set attach_save_dir=~/downloads/

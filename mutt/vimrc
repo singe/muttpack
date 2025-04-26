@@ -1,0 +1,29 @@
+syntax on
+colorscheme molokai
+set ft=xxd "hexedit syntax highlighting
+
+" If using a dark background within the editing area and syntax highlighting
+" turn on this option as well
+set background=dark
+
+set showcmd     " Show (partial) command in status line.
+set showmatch   " Show matching brackets.
+set ignorecase  " Do case insensitive matching
+set smartcase   " Do smart case matching
+
+set tabstop=2
+set shiftwidth=2
+set softtabstop=0
+set expandtab
+set smarttab
+setlocal spell spelllang=en_gb
+set foldmethod=marker
+
+"let g:xml_syntax_folding=1
+"au FileType xml setlocal foldmethod=syntax
+au FileType mail setlocal spell
+au FileType text setlocal spell
+
+" Ctrl-A select all
+map <C-a> ggVG
+map <C-c> :w !pbcopy<CR><CR>
