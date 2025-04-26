@@ -1,0 +1,77 @@
+services:
+
+  # Send/Recv mail with O365 and expose IMAP & SMTP to private mail network
+  davmail:
+    build:
+      context: ./davmail
+      dockerfile: Dockerfile
+    image: pack/davmail
+    restart: unless-stopped
+    networks:
+      - default # Internet
+      - mail_network # Private mail network
+    ports:
+      - "127.0.0.1:1389:1389"  # LDAP port accessible only to the host
+    expose:
+      - "1143"  # IMAP port over private network
+      - "1025"  # SMTP port over private network
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "1143"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Fetch mail from davmail IMAP and store in Maildir
+  mbsync:
+    build:
+      context: ./mbsync
+      dockerfile: Dockerfile
+    image: pack/mbsync
+    depends_on:
+      davmail:
+        condition: service_healthy
+    restart: on-failure
+    networks:
+      - mail_network
+    volumes:
+      - $HOME/.mail:/root/.mail
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["while :; do mbsync -a; sleep 300; done"]
+
+  # Pick up mail from queue files and send over davmail SMTP
+  msmtp:
+    build:
+      context: ./msmtp
+      dockerfile: Dockerfile
+    image: pack/msmtp
+    depends_on:
+      davmail:
+        condition: service_healthy
+    restart: on-failure
+    networks:
+      - mail_network
+    volumes:
+      - $HOME/.msmtp.queue:/root/.msmtp.queue
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["while :; do msmtp-queue -r; sleep 300; done"]
+
+  # Read mail form Maildir, Send mail to msmtp queue files
+  mutt:
+    build:
+      context: ./mutt
+      dockerfile: Dockerfile
+    image: pack/mutt
+    volumes:
+      - $HOME/.mail:/root/.mail
+      - $HOME/.msmtp.queue:/root/.msmtp.queue
+      - $HOME/Downloads:/root/downloads # For sharing downloaded files with the host
+    stdin_open: true
+    tty: true
+    logging:
+      driver: "none" # We don't want to record ncurses output
+    network_mode: "none" # Deny mutt any networking
+
+networks:
+  mail_network:
+    internal: true
+    driver: bridge
