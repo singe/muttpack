@@ -3,9 +3,6 @@ FROM alpine:latest as builder
 RUN apk update
 RUN apk add build-base autoconf automake libidn2-dev ncurses-dev openssl-dev bzip2-dev cyrus-sasl-dev krb5-dev zlib-dev git kyotocabinet-dev gpgme-dev
 RUN git clone --depth 1 https://gitlab.com/muttmua/mutt.git
-# Apply the S/MIME patch for outlook
-COPY mutt.patch mutt/
-RUN cd mutt && patch < mutt.patch
 # Make exploitation harder
 ENV CFLAGS "-g -O2 -fstack-protector-strong -Wformat -Werror=format-security -fPIE -fstack-clash-protection"
 ENV CPPFLAGS "-Wdate-time -D_FORTIFY_SOURCE=3"
